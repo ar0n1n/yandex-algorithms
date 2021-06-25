@@ -1,3 +1,70 @@
+///// V1 /////
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+struct point {
+    int64_t x, y;
+};
+
+int main() {
+    ifstream in("input.txt");
+    ofstream out("output.txt");
+
+    int n, ans = 0;
+    in >> n;
+
+    vector<point> v;
+    vector<vector<pair<int64_t,int64_t>>> dist(n);
+
+    for (int i = 0; i < n; ++i) {
+        point p; in >> p.x >> p.y;
+        v.push_back(p);
+    }
+
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            if (i == j) continue;
+            int64_t xdiff = (v[i].x - v[j].x);
+            int64_t ydiff = (v[i].y - v[j].y);
+            int64_t d =  xdiff * xdiff + ydiff * ydiff;
+            dist[i].push_back(make_pair(d, j));
+        }
+    }
+
+    for (int i = 0; i < n; ++i) {
+        sort(dist[i].begin(), dist[i].end());
+        int count = 0;
+        for (int j = 0; j < dist[i].size(); ++j) {
+            ++count;
+            if (dist[i][j].first != dist[i][j + 1].first
+                    || j == dist[i].size() - 1) {
+                if (count > 1) {
+                    for (int k = j - count + 1; k <= j; ++k) {
+                        for (int m = k + 1; m <= j; ++m) {
+                            if ((v[i].x * (v[dist[i][m].second].y - v[dist[i][k].second].y) +
+                                 v[dist[i][m].second].x * (v[dist[i][k].second].y - v[i].y) +
+                                 v[dist[i][k].second].x * (v[i].y - v[dist[i][m].second].y)) != 0)
+                                ans += 1;
+                        }
+                    }
+                }
+                count = 0;
+            }
+        }
+    }
+
+    out << ans << endl;
+
+    return 0;
+}
+
+///// V2 /////
+
 #include <iostream>
 #include <fstream>
 #include <vector>
